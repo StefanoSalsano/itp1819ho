@@ -5,6 +5,8 @@ NODE_NAME=r2
 
 sysctl -w net.ipv4.ip_forward=1
 
+chown quagga:quagga $BASE_DIR/$NODE_NAME
+
 zebra -f $BASE_DIR/$NODE_NAME/zebra.conf -d -z $BASE_DIR/$NODE_NAME/zebra.sock -i $BASE_DIR/$NODE_NAME/zebra.pid
 
 sleep 1
