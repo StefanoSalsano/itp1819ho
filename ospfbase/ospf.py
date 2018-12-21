@@ -9,7 +9,7 @@ from mininet.cli import CLI
 from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
 
-BASEDIR = "/home/user/mytests/nodeconf/"
+BASEDIR = "/home/user/mytests/ospfbase/nodeconf/"
 PRIVDIR = '/var/priv'
 
 class BaseNode(Host):

@@ -1,6 +1,5 @@
 #!/bin/sh
 
-BASE_DIR=/home/user/mytests/nodeconf
 NODE_NAME=h1
 IP_ADDR=10.0.0.2/16
 GW_ADDR=10.0.0.1
