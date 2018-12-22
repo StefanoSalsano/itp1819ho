@@ -1,0 +1,95 @@
+#!/usr/bin/python
+
+import os
+import argparse
+import sys
+
+from collections import OrderedDict
+
+OUTPUT_PID_TABLE_FILE = "/tmp/pid_table_file.txt"
+
+    
+def shell_on_mininet(args):
+
+    # command to enter a namespace: sudo nsenter -t 21081 -n /bin/bash
+
+    pid_table = OrderedDict([])
+
+    if not os.path.exists(OUTPUT_PID_TABLE_FILE):
+        print 'The file %s does not exists. Check that a compatible mininet script is running' % OUTPUT_PID_TABLE_FILE
+        sys.exit(1)
+
+
+    with open(OUTPUT_PID_TABLE_FILE,"r") as file:
+        for line in file: 
+            a = line.rstrip('\n').split(' ')
+            pid_table[a[0]]={'pid':a[1], 'command': '--command="sudo nsenter -t %s -n /bin/bash" --title="%s"' % (a[1],a[0])}
+    #print pid_table
+    
+    command_string = ''
+    if args.xfce4:
+        command_string = '/usr/bin/xfce4-terminal '
+        firstline = True
+        if args.all:
+            for key, value in pid_table.iteritems():
+                command_string = command_string + ('' if firstline else ' --tab ') + value['command']
+                firstline = False
+        else:
+            for node in args.nodes :
+                if node in pid_table:
+                    command_string = command_string + ('' if firstline else ' --tab ') + pid_table[node]['command']
+                    firstline = False
+                else :
+                    print 'node %s not existing' % node
+                    sys.exit(1)
+    else:
+        if args.nodes[0] in pid_table:
+            command_string = 'sudo nsenter -t %s -n /bin/bash' % pid_table[args.nodes[0]]['pid']
+        else :
+            print 'node %s not existing' % args.nodes[0]
+            sys.exit(1)
+
+        pass
+
+    #print command_string
+    os.system(command_string)
+
+def parse_cmd_line():
+    parser = argparse.ArgumentParser(description='open shell(s) on Mininet nodes')
+    parser.add_argument('-a', '--all', dest='all',action='store_true', help='start shell on all nodes using xfce4-terminal')
+    parser.add_argument('-x', '--xfce4', dest='xfce4',action='store_true', help='start shell using xfce4-terminal')
+    parser.add_argument('--install', dest='install',action='store_true', help='install in /usr/bin')
+    parser.add_argument('nodes', nargs='*', help='mininet node (or nodes if -x is used)')
+
+    args = parser.parse_args()
+
+    if args.install:
+        os.system('sudo cp minish /usr/bin')
+        os.system('sudo chmod +x /usr/bin/minish')
+        if os.path.exists('/usr/bin/minish'):
+            print 'Minish installed'
+            sys.exit(0)
+        else:
+            print 'Minish NOT installed'
+            sys.exit(1)
+            
+    if args.all :
+        args.xfce4 = True
+
+    if (not args.all and len(args.nodes)==0) :
+        parser.print_help()
+        sys.exit(1)
+    
+    if (args.all and len(args.nodes)!=0):
+        parser.print_help()
+        sys.exit(1)
+
+    if (not args.xfce4 and not args.all and len(args.nodes)!=1) :
+        parser.print_help()
+        sys.exit(1)
+
+    shell_on_mininet(args)
+
+if __name__ == '__main__':
+    # Tell mininet to print useful information
+    parse_cmd_line()
