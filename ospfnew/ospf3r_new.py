@@ -43,29 +43,42 @@ class BaseNode(Host):
             self.cmd('source %s' %BASEDIR+self.name+"/start.sh")
 
     def cleanup(self):
+        def remove_if_exists (filename):
+            if os.path.exists(filename):
+                os.remove(filename)
+
         Host.cleanup(self)
         # Rm dir
         if os.path.exists(self.dir):
             shutil.rmtree(self.dir)
 
-        if os.path.exists(BASEDIR+self.name+"/zebra.pid"):
-            os.remove(BASEDIR+self.name+"/zebra.pid")
+        remove_if_exists(BASEDIR+self.name+"/zebra.pid")
+        remove_if_exists(BASEDIR+self.name+"/zebra.log")
+        remove_if_exists(BASEDIR+self.name+"/zebra.sock")
+        remove_if_exists(BASEDIR+self.name+"/ospfd.pid")
+        remove_if_exists(BASEDIR+self.name+"/ospfd.log")
+        remove_if_exists(OUTPUT_PID_TABLE_FILE)
 
-        if os.path.exists(BASEDIR+self.name+"/zebra.log"):
-            os.remove(BASEDIR+self.name+"/zebra.log")
+        # if os.path.exists(BASEDIR+self.name+"/zebra.pid"):
+        #     os.remove(BASEDIR+self.name+"/zebra.pid")
 
-        if os.path.exists(BASEDIR+self.name+"/zebra.sock"):
-            os.remove(BASEDIR+self.name+"/zebra.sock")
+        # if os.path.exists(BASEDIR+self.name+"/zebra.log"):
+        #     os.remove(BASEDIR+self.name+"/zebra.log")
 
-        if os.path.exists(BASEDIR+self.name+"/ospfd.pid"):
-            os.remove(BASEDIR+self.name+"/ospfd.pid")
+        # if os.path.exists(BASEDIR+self.name+"/zebra.sock"):
+        #     os.remove(BASEDIR+self.name+"/zebra.sock")
 
-        if os.path.exists(BASEDIR+self.name+"/ospfd.log"):
-            os.remove(BASEDIR+self.name+"/ospfd.log")
+        # if os.path.exists(BASEDIR+self.name+"/ospfd.pid"):
+        #     os.remove(BASEDIR+self.name+"/ospfd.pid")
 
-        if os.path.exists(OUTPUT_PID_TABLE_FILE):
-            os.remove(OUTPUT_PID_TABLE_FILE)
-        
+        # if os.path.exists(BASEDIR+self.name+"/ospfd.log"):
+        #     os.remove(BASEDIR+self.name+"/ospfd.log")
+
+        # if os.path.exists(OUTPUT_PID_TABLE_FILE):
+        #     os.remove(OUTPUT_PID_TABLE_FILE)
+
+
+
 
 class Router(BaseNode):
     def __init__(self, name, *args, **kwargs):
